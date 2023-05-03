@@ -15,4 +15,4 @@ router.post("/user/change", userController.changePassword, authMiddleware);
 router.post("/file/add", uploadController.uploadFile, authMiddleware);
 router.delete("/file/delete", uploadController.deleteFile, authMiddleware);
 router.post("/file/all", uploadController.getAllImages, authMiddleware);
-router.post("/;urlId", uploadController.redirectUrl, authMiddleware);
+router.post("/:urlId", uploadController.redirectUrl, authMiddleware);
