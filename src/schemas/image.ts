@@ -6,4 +6,5 @@ export interface ImageSchema {
   owner?: ObjectId;
   actualUrl: string;
   shortenUrl?: string;
+  urlId: string;
 }

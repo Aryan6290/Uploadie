@@ -32,11 +32,13 @@ export const uploadFile = async (req: Request, res: Response) => {
       Key: `${key}`,
     };
     const uploadedImage = await s3.upload(params).promise();
+    const shortenData = shortenUrl(uploadedImage.Location);
 
     const imageObject = await db.collection<ImageSchema>("images").insertOne({
       owner: new ObjectId(userId),
       actualUrl: uploadedImage.Location,
-      shortenUrl: shortenUrl(uploadedImage.Location),
+      shortenUrl: shortenData[0],
+      urlId: shortenData[1],
     });
 
     const agenda = new Agenda({ db: { address: Data.AGENDA_DATABASE } });
@@ -94,5 +96,22 @@ export const getAllImages = async (req: Request, res: Response) => {
     return res.status(200).send({ message: "Successful", data: images });
   } catch (e) {
     return res.status(500).send({ message: "Server error" });
+  }
+};
+
+export const redirectUrl = async (req: Request, res: Response) => {
+  try {
+    const db = getDatabase();
+    const { urlId } = req.body;
+    const image = await db
+      .collection<ImageSchema>("images")
+      .findOne({ urlId: urlId });
+    if (!image) {
+      return res.status(401).send({ message: "No image found with this url" });
+    }
+    return res.status(200).send({ data: image.actualUrl });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("Server Error");
   }
 };
